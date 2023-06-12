@@ -371,3 +371,774 @@ cqlsh:first_keyspace> select * from books_by_author;
 
 (7 rows)
 cqlsh:first_keyspace>
+
+
+cqlsh> use first_keyspace;
+cqlsh:first_keyspace> create table employee(emp_id int, name text, designation text, primary key(emp_id));
+cqlsh:first_keyspace> show tables;
+Improper show command.
+cqlsh:first_keyspace> show table;
+Improper show command.
+cqlsh:first_keyspace> describe table;
+Improper describe command.
+cqlsh:first_keyspace> describe tables;
+
+employee
+
+cqlsh:first_keyspace> describe employee;
+
+CREATE TABLE first_keyspace.employee (
+    emp_id int PRIMARY KEY,
+    designation text,
+    name text
+) WITH bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+cqlsh:first_keyspace> insert into employee(emp_id, name,designation) value(1001, "Arvind", "Developer");
+SyntaxException: line 1:47 mismatched input 'value' expecting K_VALUES (...employee(emp_id, name,designation) [value]...)
+cqlsh:first_keyspace> insert into employee(emp_id, name,designation) value(1001, 'Arvind', 'Developer');
+SyntaxException: line 1:47 mismatched input 'value' expecting K_VALUES (...employee(emp_id, name,designation) [value]...)
+cqlsh:first_keyspace> insert into employee(emp_id,name,designation) value(1001,'Arvind','Developer');
+SyntaxException: line 1:46 mismatched input 'value' expecting K_VALUES (... employee(emp_id,name,designation) [value]...)
+cqlsh:first_keyspace> insert into employee(emp_id,name,designation) values(1001,'Arvind','Developer');
+cqlsh:first_keyspace> insert into employee(emp_id,name,designation) values(1002,'Surya','Accountant');
+cqlsh:first_keyspace> insert into employee(emp_id,name,designation) values(1003,'Ramesh','Architect');
+cqlsh:first_keyspace>
+cqlsh:first_keyspace> insert into employee(emp_id,name,designation) values(1003,'Ramesh','Architect');
+cqlsh:first_keyspace> select * from employee;
+
+ emp_id | designation | name
+--------+-------------+--------
+   1001 |   Developer | Arvind
+   1003 |   Architect | Ramesh
+   1002 |  Accountant |  Surya
+
+(3 rows)
+cqlsh:first_keyspace> insert into employee(emp_id,name,designation) values(1003,'Ramesh','Architect');
+cqlsh:first_keyspace> select * from employee;
+
+ emp_id | designation | name
+--------+-------------+--------
+   1001 |   Developer | Arvind
+   1003 |   Architect | Ramesh
+   1002 |  Accountant |  Surya
+
+(3 rows)
+cqlsh:first_keyspace> create table books_by_author(author_name text, publish_year int,
+                  ... book_id uuid, book_name text,rating float, primary key(author_name,publish_year,book_id));
+cqlsh:first_keyspace> describe books_by_author;
+
+CREATE TABLE first_keyspace.books_by_author (
+    author_name text,
+    publish_year int,
+    book_id uuid,
+    book_name text,
+    rating float,
+    PRIMARY KEY (author_name, publish_year, book_id)
+) WITH CLUSTERING ORDER BY (publish_year ASC, book_id ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+cqlsh:first_keyspace> create table x(a int,b int,c text,d text,primary key((a,b),c,d));
+cqlsh:first_keyspace> describe x;
+
+CREATE TABLE first_keyspace.x (
+    a int,
+    b int,
+    c text,
+    d text,
+    PRIMARY KEY ((a, b), c, d)
+) WITH CLUSTERING ORDER BY (c ASC, d ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+cqlsh:first_keyspace> insert into books_by_author(author,name,publish_year,book_id,book_name,rating) values('Criag Walls', 2001, uuid(),'Spring Action 1.0', 4.5);
+InvalidRequest: Error from server: code=2200 [Invalid query] message="Unmatched column names/values"
+cqlsh:first_keyspace> insert into books_by_author(author_name,publish_year,book_id,book_name,rating) values('Criag Walls', 2001, uuid(),'Spring Action 1.0', 4.5);
+cqlsh:first_keyspace> insert into books_by_author(author_name,publish_year,book_id,book_name,rating) values('Criag Walls', 2005, uuid(),'Spring Action 2.0', 4.4);
+cqlsh:first_keyspace> insert into books_by_author(author_name,publish_year,book_id,book_name,rating) values('Criag Walls', 2005, uuid(),'Spring Action 3.0', 4.2);
+cqlsh:first_keyspace>
+cqlsh:first_keyspace>
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name | publish_year | book_id                              | book_name         | rating
+-------------+--------------+--------------------------------------+-------------------+--------
+ Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |    4.5
+ Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |    4.4
+ Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |    4.2
+
+(3 rows)
+cqlsh:first_keyspace> insert into books_by_author(author_name,publish_year,book_id,book_name,rating)
+                  ... values ('Yaswant Kanetkar',2001,uuid(),'Let us C',4.4);
+cqlsh:first_keyspace>
+cqlsh:first_keyspace> insert into books_by_author(author_name,publish_year,book_id,book_name,rating)
+                  ... values ('Yaswant Kanetkar',2007,uuid(),'Exploring C',4.2);
+cqlsh:first_keyspace> insert into books_by_author(author_name,publish_year,book_id,book_name,rating)
+                  ... values ('Yaswant Kanetkar',2009,uuid(),'Exploring C++',4.1);
+cqlsh:first_keyspace>
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | rating
+------------------+--------------+--------------------------------------+-------------------+--------
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |    4.1
+
+(6 rows)
+cqlsh:first_keyspace> alter table books_by_author add emails set<text>;
+cqlsh:first_keyspace> describe books_by_author;
+
+CREATE TABLE first_keyspace.books_by_author (
+    author_name text,
+    publish_year int,
+    book_id uuid,
+    book_name text,
+    emails set<text>,
+    rating float,
+    PRIMARY KEY (author_name, publish_year, book_id)
+) WITH CLUSTERING ORDER BY (publish_year ASC, book_id ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+cqlsh:first_keyspace> update books_by_author set emails={'craig@yahoo.com','walls@gmail.com','walls@gmail.com'} where author_name='Craig Walls' and publish_year=2001 and book_id=1510a1e5-02ad-42fc-becd-cc611ef8cc4b;
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | emails                                 | rating
+------------------+--------------+--------------------------------------+-------------------+----------------------------------------+--------
+      Craig Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b |              null | {'craig@yahoo.com', 'walls@gmail.com'} |   null
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |                                   null |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |                                   null |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |                                   null |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C |                                   null |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |                                   null |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |                                   null |    4.1
+
+(7 rows)
+cqlsh:first_keyspace> alter table books_by_author add phone_numbers list<text>;
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | emails                                 | phone_numbers | rating
+------------------+--------------+--------------------------------------+-------------------+----------------------------------------+---------------+--------
+      Craig Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b |              null | {'craig@yahoo.com', 'walls@gmail.com'} |          null |   null
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |                                   null |          null |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |                                   null |          null |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |                                   null |          null |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C |                                   null |          null |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |                                   null |          null |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |                                   null |          null |    4.1
+
+(7 rows)
+cqlsh:first_keyspace> update books_by_author set emails={'craig@yahoo.com','walls@gmail.com','walls@gmail.com'} where author_name='Yaswant Kanetkar' and publish_year=2001 and book_id=066e1d6b-e10f-4781-adf2-25e7ba3d70b0;
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | emails                                 | phone_numbers | rating
+------------------+--------------+--------------------------------------+-------------------+----------------------------------------+---------------+--------
+      Craig Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b |              null | {'craig@yahoo.com', 'walls@gmail.com'} |          null |   null
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |                                   null |          null |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |                                   null |          null |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |                                   null |          null |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C | {'craig@yahoo.com', 'walls@gmail.com'} |          null |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |                                   null |          null |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |                                   null |          null |    4.1
+
+(7 rows)
+cqlsh:first_keyspace> update books_by_author set phone_numbers=['9442772634','9880372634'] where author_name='Craig Walls' and publish_year=2001 and book_id=;
+SyntaxException: line 1:135 no viable alternative at input ';' (...and publish_year=2001 and book_id=[;])
+cqlsh:first_keyspace> update books_by_author set phone_numbers=['9442772634','9880372634'] where author_name='Craig Walls' and publish_year=2001 and book_id=1510a1e5-02ad-42fc-becd-cc611ef8cc4b;
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | emails                                 | phone_numbers                | rating
+------------------+--------------+--------------------------------------+-------------------+----------------------------------------+------------------------------+--------
+      Craig Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b |              null | {'craig@yahoo.com', 'walls@gmail.com'} | ['9442772634', '9880372634'] |   null
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |                                   null |                         null |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |                                   null |                         null |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |                                   null |                         null |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C | {'craig@yahoo.com', 'walls@gmail.com'} |                         null |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |                                   null |                         null |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |                                   null |                         null |    4.1
+
+(7 rows)
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | emails                                 | phone_numbers                | rating
+------------------+--------------+--------------------------------------+-------------------+----------------------------------------+------------------------------+--------
+      Craig Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b |              null | {'craig@yahoo.com', 'walls@gmail.com'} | ['9442772634', '9880372634'] |   null
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |                                   null |                         null |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |                                   null |                         null |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |                                   null |                         null |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C | {'craig@yahoo.com', 'walls@gmail.com'} |                         null |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |                                   null |                         null |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |                                   null |                         null |    4.1
+
+(7 rows)
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | emails                                 | phone_numbers                | rating
+------------------+--------------+--------------------------------------+-------------------+----------------------------------------+------------------------------+--------
+      Craig Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b |              null | {'craig@yahoo.com', 'walls@gmail.com'} | ['9442772634', '9880372634'] |   null
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |                                   null |                         null |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |                                   null |                         null |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |                                   null |                         null |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C | {'craig@yahoo.com', 'walls@gmail.com'} |                         null |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |                                   null |                         null |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |                                   null |                         null |    4.1
+
+(7 rows)
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | emails                                 | phone_numbers                | rating
+------------------+--------------+--------------------------------------+-------------------+----------------------------------------+------------------------------+--------
+      Craig Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b |              null | {'craig@yahoo.com', 'walls@gmail.com'} | ['9442772634', '9880372634'] |   null
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |                                   null |                         null |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |                                   null |                         null |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |                                   null |                         null |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C | {'craig@yahoo.com', 'walls@gmail.com'} |                         null |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |                                   null |                         null |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |                                   null |                         null |    4.1
+
+(7 rows)
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | emails                                 | phone_numbers                | rating
+------------------+--------------+--------------------------------------+-------------------+----------------------------------------+------------------------------+--------
+      Craig Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b |              null | {'craig@yahoo.com', 'walls@gmail.com'} | ['9442772634', '9880372634'] |   null
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |                                   null |                         null |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |                                   null |                         null |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |                                   null |                         null |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C | {'craig@yahoo.com', 'walls@gmail.com'} |                         null |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |                                   null |                         null |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |                                   null |                         null |    4.1
+
+(7 rows)
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | emails                                 | phone_numbers                | rating
+------------------+--------------+--------------------------------------+-------------------+----------------------------------------+------------------------------+--------
+      Craig Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b |              null | {'craig@yahoo.com', 'walls@gmail.com'} | ['9442772634', '9880372634'] |   null
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |                                   null |                         null |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |                                   null |                         null |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |                                   null |                         null |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C | {'craig@yahoo.com', 'walls@gmail.com'} |                         null |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |                                   null |                         null |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |                                   null |                         null |    4.1
+
+(7 rows)
+cqlsh:first_keyspace>
+cqlsh:first_keyspace>
+cqlsh:first_keyspace>
+cqlsh:first_keyspace>
+cqlsh:first_keyspace>
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | emails                                 | phone_numbers                | rating
+------------------+--------------+--------------------------------------+-------------------+----------------------------------------+------------------------------+--------
+      Craig Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b |              null | {'craig@yahoo.com', 'walls@gmail.com'} | ['9442772634', '9880372634'] |   null
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |                                   null |                         null |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |                                   null |                         null |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |                                   null |                         null |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C | {'craig@yahoo.com', 'walls@gmail.com'} |                         null |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |                                   null |                         null |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |                                   null |                         null |    4.1
+
+(7 rows)
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | emails                                 | phone_numbers                | rating
+------------------+--------------+--------------------------------------+-------------------+----------------------------------------+------------------------------+--------
+      Craig Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b |              null | {'craig@yahoo.com', 'walls@gmail.com'} | ['9442772634', '9880372634'] |   null
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |                                   null |                         null |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |                                   null |                         null |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |                                   null |                         null |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C | {'craig@yahoo.com', 'walls@gmail.com'} |                         null |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |                                   null |                         null |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |                                   null |                         null |    4.1
+
+(7 rows)
+cqlsh:first_keyspace> delete phone_numbers[1] from books_by_author where author_name='Craig Walls' and publish_year=2001 and book_id=1510a1e5-02ad-42fc-becd-cc611ef8cc4b ;
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | emails                                 | phone_numbers  | rating
+------------------+--------------+--------------------------------------+-------------------+----------------------------------------+----------------+--------
+      Craig Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b |              null | {'craig@yahoo.com', 'walls@gmail.com'} | ['9442772634'] |   null
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |                                   null |           null |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |                                   null |           null |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |                                   null |           null |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C | {'craig@yahoo.com', 'walls@gmail.com'} |           null |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |                                   null |           null |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |                                   null |           null |    4.1
+
+(7 rows)
+cqlsh:first_keyspace> alter table books_by_author add family_members map<text,text>;
+cqlsh:first_keyspace> update books_by_author set family_members={'wife':'Teresa','son':'David'} where author_name='Craig Walls' and
+                  ... publish_year=2001 and book_id=1510a1e5-02ad-42fc-becd-cc611ef8cc4b;
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | emails                                 | family_members                     | phone_numbers  | rating
+------------------+--------------+--------------------------------------+-------------------+----------------------------------------+------------------------------------+----------------+--------
+      Craig Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b |              null | {'craig@yahoo.com', 'walls@gmail.com'} | {'son': 'David', 'wife': 'Teresa'} | ['9442772634'] |   null
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |                                   null |                               null |           null |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |                                   null |                               null |           null |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |                                   null |                               null |           null |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C | {'craig@yahoo.com', 'walls@gmail.com'} |                               null |           null |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |                                   null |                               null |           null |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |                                   null |                               null |           null |    4.1
+
+(7 rows)
+cqlsh:first_keyspace> update books_by_author set family_members=family_members+{'father':'Peter'} where author_name='Craig Walls' and
+                  ... publish_year=2001 and book_id=1510a1e5-02ad-42fc-becd-cc611ef8cc4b ;
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | emails                                 | family_members                                        | phone_numbers  | rating
+------------------+--------------+--------------------------------------+-------------------+----------------------------------------+-------------------------------------------------------+----------------+--------
+      Craig Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b |              null | {'craig@yahoo.com', 'walls@gmail.com'} | {'father': 'Peter', 'son': 'David', 'wife': 'Teresa'} | ['9442772634'] |   null
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |                                   null |                                                  null |           null |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |                                   null |                                                  null |           null |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |                                   null |                                                  null |           null |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C | {'craig@yahoo.com', 'walls@gmail.com'} |                                                  null |           null |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |                                   null |                                                  null |           null |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |                                   null |                                                  null |           null |    4.1
+
+(7 rows)
+cqlsh:first_keyspace> update books_by_author set family_members=family_members-{'father'} where author_name='Craig Walls' and publish_year=2001 and book_id=1510a1e5-02ad-42fc-becd-cc611ef8cc4b ;
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | emails                                 | family_members                     | phone_numbers  | rating
+------------------+--------------+--------------------------------------+-------------------+----------------------------------------+------------------------------------+----------------+--------
+      Craig Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b |              null | {'craig@yahoo.com', 'walls@gmail.com'} | {'son': 'David', 'wife': 'Teresa'} | ['9442772634'] |   null
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |                                   null |                               null |           null |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |                                   null |                               null |           null |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |                                   null |                               null |           null |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C | {'craig@yahoo.com', 'walls@gmail.com'} |                               null |           null |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |                                   null |                               null |           null |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |                                   null |                               null |           null |    4.1
+
+(7 rows)
+cqlsh:first_keyspace> create type address_type(door_no int,street_name text,location text,city text);create type address_type(door_no int,street_name text,location text,city text);
+InvalidRequest: Error from server: code=2200 [Invalid query] message="A user type of name first_keyspace.address_type already exists"
+cqlsh:first_keyspace> create type address_type(door_no int,street_name text,location text,city text);
+InvalidRequest: Error from server: code=2200 [Invalid query] message="A user type of name first_keyspace.address_type already exists"
+cqlsh:first_keyspace> select * from books_by_author;
+
+ author_name      | publish_year | book_id                              | book_name         | emails                                 | family_members                     | phone_numbers  | rating
+------------------+--------------+--------------------------------------+-------------------+----------------------------------------+------------------------------------+----------------+--------
+      Craig Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b |              null | {'craig@yahoo.com', 'walls@gmail.com'} | {'son': 'David', 'wife': 'Teresa'} | ['9442772634'] |   null
+      Criag Walls |         2001 | 1510a1e5-02ad-42fc-becd-cc611ef8cc4b | Spring Action 1.0 |                                   null |                               null |           null |    4.5
+      Criag Walls |         2005 | 24e56cbc-baee-4145-960b-110a8a36c435 | Spring Action 2.0 |                                   null |                               null |           null |    4.4
+      Criag Walls |         2005 | c97e79bd-fff1-4eab-a3f5-b174d7f65390 | Spring Action 3.0 |                                   null |                               null |           null |    4.2
+ Yaswant Kanetkar |         2001 | 066e1d6b-e10f-4781-adf2-25e7ba3d70b0 |          Let us C | {'craig@yahoo.com', 'walls@gmail.com'} |                               null |           null |    4.4
+ Yaswant Kanetkar |         2007 | 708aa0e0-f756-4697-9a1a-1f599ca1b3d2 |       Exploring C |                                   null |                               null |           null |    4.2
+ Yaswant Kanetkar |         2009 | 29770e8b-8289-4fc0-b0b8-09711c728f63 |     Exploring C++ |                                   null |                               null |           null |    4.1
+
+(7 rows)
+cqlsh:first_keyspace> describe type address_type;
+
+CREATE TYPE first_keyspace.address_type (
+    door_no int,
+    street_name text,
+    location text,
+    city text
+);
+cqlsh:first_keyspace> create table customer(cust_id int,name text,current_address address_type,primary key(cust_id));
+cqlsh:first_keyspace> describe customer;
+
+CREATE TABLE first_keyspace.customer (
+    cust_id int PRIMARY KEY,
+    current_address address_type,
+    name text
+) WITH bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+cqlsh:first_keyspace> insert into customer (cust_id,name,current_address) values (6001,'Arvind',{door_no:23,street_name:'G-10th Street',location:'Ulsoor',city:'Bangalore'});
+cqlsh:first_keyspace> insert into customer (cust_id,name,current_address) values (6002,'Rajiv',{door_no:123,street_name:'Nethaji Road',location:'Malad East',city:'Mumbai'});
+cqlsh:first_keyspace> select * from customer;
+
+ cust_id | current_address                                                                     | name
+---------+-------------------------------------------------------------------------------------+--------
+    6002 | {door_no: 123, street_name: 'Nethaji Road', location: 'Malad East', city: 'Mumbai'} |  Rajiv
+    6001 |  {door_no: 23, street_name: 'G-10th Street', location: 'Ulsoor', city: 'Bangalore'} | Arvind
+
+(2 rows)
+cqlsh:first_keyspace> update customer set current_address={door_no:523,street_name:'G-10th Street',location:'Ulsoor',city:'Bangalore'} where cust_id=6001;
+cqlsh:first_keyspace> select * from customer;
+
+ cust_id | current_address                                                                     | name
+---------+-------------------------------------------------------------------------------------+--------
+    6002 | {door_no: 123, street_name: 'Nethaji Road', location: 'Malad East', city: 'Mumbai'} |  Rajiv
+    6001 | {door_no: 523, street_name: 'G-10th Street', location: 'Ulsoor', city: 'Bangalore'} | Arvind
+
+(2 rows)
+cqlsh:first_keyspace> update customer set current_address.location='Malad West' where cust_id=6002;
+cqlsh:first_keyspace> select * from customer;
+
+ cust_id | current_address                                                                     | name
+---------+-------------------------------------------------------------------------------------+--------
+    6002 | {door_no: 123, street_name: 'Nethaji Road', location: 'Malad West', city: 'Mumbai'} |  Rajiv
+    6001 | {door_no: 523, street_name: 'G-10th Street', location: 'Ulsoor', city: 'Bangalore'} | Arvind
+
+(2 rows)
+cqlsh:first_keyspace> create table emp(id int,name text,address frozen<address_type>,primary key(id));
+cqlsh:first_keyspace> describe emp;
+
+CREATE TABLE first_keyspace.emp (
+    id int PRIMARY KEY,
+    address frozen<address_type>,
+    name text
+) WITH bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+cqlsh:first_keyspace> insert into emp(id,name,address) values (5001,'Rakesh',{door_no:11,street_name:'G-10th street',location:'Panjagutta',city:'Hyderabad'})
+                  ... ;
+cqlsh:first_keyspace>
+cqlsh:first_keyspace>
+cqlsh:first_keyspace> select * from emp;
+
+ id   | address                                                                                | name
+------+----------------------------------------------------------------------------------------+--------
+ 5001 | {door_no: 11, street_name: 'G-10th street', location: 'Panjagutta', city: 'Hyderabad'} | Rakesh
+
+(1 rows)
+cqlsh:first_keyspace> update emp set address.location='Ameerpet' where id=5001;
+InvalidRequest: Error from server: code=2200 [Invalid query] message="Invalid operation (address.location = 'Ameerpet') for frozen UDT column address"
+cqlsh:first_keyspace> # failed because frozen field cannot be updated individually
+Invalid syntax at line 1, char 1
+  # failed because frozen field cannot be updated individually
+  ^
+cqlsh:first_keyspace> create table test*a iint, b list<text>, primary key(a));
+SyntaxException: line 1:17 no viable alternative at input '*' (create table [test]*...)
+cqlsh:first_keyspace> create table test(a iint, b list<text>, primary key(a));
+InvalidRequest: Error from server: code=2200 [Invalid query] message="Unknown type first_keyspace.iint"
+cqlsh:first_keyspace> create table test a (int, b list<text>, primary key(a));
+SyntaxException: line 1:18 no viable alternative at input 'a' (create table [test] a...)
+cqlsh:first_keyspace> create table test (a int, b list<text>, primary key(a));
+cqlsh:first_keyspace> describe test;
+
+CREATE TABLE first_keyspace.test (
+    a int PRIMARY KEY,
+    b list<text>
+) WITH bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+cqlsh:first_keyspace> insert into test(a,b) values(101,['a','b','c']);
+cqlsh:first_keyspace> select * from test;
+
+ a   | b
+-----+-----------------
+ 101 | ['a', 'b', 'c']
+
+(1 rows)
+cqlsh:first_keyspace> update test set b[1]='x' where a=101
+                  ... ;
+cqlsh:first_keyspace>
+cqlsh:first_keyspace> select * from test;
+
+ a   | b
+-----+-----------------
+ 101 | ['a', 'x', 'c']
+
+(1 rows)
+cqlsh:first_keyspace>
+cqlsh:first_keyspace>
+cqlsh:first_keyspace> create table test1 (a int, b frozen list<text>, primary key(a));
+SyntaxException: line 1:36 no viable alternative at input 'list' (...test1 (a int, b [frozen] list...)
+cqlsh:first_keyspace> create table test1 (a int, b frozen<list<text>>, primary key(a));
+cqlsh:first_keyspace> describe test1
+
+CREATE TABLE first_keyspace.test1 (
+    a int PRIMARY KEY,
+    b frozen<list<text>>
+) WITH bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+cqlsh:first_keyspace> insert into test1(a,b) values(101,['a','b','c']);
+cqlsh:first_keyspace> select * from test1;
+
+ a   | b
+-----+-----------------
+ 101 | ['a', 'b', 'c']
+
+(1 rows)
+cqlsh:first_keyspace> update test1 set b[1]='x' where a=101;
+InvalidRequest: Error from server: code=2200 [Invalid query] message="Invalid operation (b[1] = 'x') for frozen collection column b"
+cqlsh:first_keyspace>
+cqlsh:first_keyspace>
+cqlsh:first_keyspace>
+cqlsh:first_keyspace> update test1 set b=['d','e'] where a=101;
+cqlsh:first_keyspace> select * from test1;
+
+ a   | b
+-----+------------
+ 101 | ['d', 'e']
+
+(1 rows)
+cqlsh:first_keyspace> create table users(user_id int,name text,country text,primary key(user_id));
+cqlsh:first_keyspace> insert into users(user_id,name,country) values(1001,'David','UK');
+cqlsh:first_keyspace> insert into users(user_id,name,country) values(1002,'Arvind','IN');
+cqlsh:first_keyspace> insert into users(user_id,name,country) values(1003,'Sandeep','IN');
+cqlsh:first_keyspace> insert into users(user_id,name,country) values(1004,'Miller','US');
+cqlsh:first_keyspace> insert into users(user_id,name,country) values(1005,'Perry','UK');
+cqlsh:first_keyspace>
+cqlsh:first_keyspace> select * from users where user_id=1004;
+
+ user_id | country | name
+---------+---------+--------
+    1004 |      US | Miller
+
+(1 rows)
+cqlsh:first_keyspace> select * from users where country='UK';
+InvalidRequest: Error from server: code=2200 [Invalid query] message="Cannot execute this query as it might involve data filtering and thus may have unpredictable performance. If you want to execute this query despite the performance unpredictability, use ALLOW FILTERING"
+cqlsh:first_keyspace> select * from users where country='UK' allow filtering;
+
+ user_id | country | name
+---------+---------+-------
+    1005 |      UK | Perry
+    1001 |      UK | David
+
+(2 rows)
+cqlsh:first_keyspace> create index country_idx on users(country);
+cqlsh:first_keyspace> alter table users add pincodes set<int>;
+cqlsh:first_keyspace> select * from users;
+
+ user_id | country | name    | pincodes
+---------+---------+---------+----------
+    1004 |      US |  Miller |     null
+    1005 |      UK |   Perry |     null
+    1001 |      UK |   David |     null
+    1003 |      IN | Sandeep |     null
+    1002 |      IN |  Arvind |     null
+
+(5 rows)
+cqlsh:first_keyspace> create index pincode_usr_idx on users(pincodes);
+cqlsh:first_keyspace> select * from users;
+
+ user_id | country | name    | pincodes
+---------+---------+---------+----------
+    1004 |      US |  Miller |     null
+    1005 |      UK |   Perry |     null
+    1001 |      UK |   David |     null
+    1003 |      IN | Sandeep |     null
+    1002 |      IN |  Arvind |     null
+
+(5 rows)
+cqlsh:first_keyspace> describe users;
+
+CREATE TABLE first_keyspace.users (
+    user_id int PRIMARY KEY,
+    country text,
+    name text,
+    pincodes set<int>
+) WITH bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+CREATE INDEX country_idx ON first_keyspace.users (country);
+CREATE INDEX pincode_usr_idx ON first_keyspace.users (values(pincodes));
+
+cqlsh:first_keyspace> update users set pincodes={342444,124551} where user_id=1001;
+cqlsh:first_keyspace> update users set pincodes={342444,724551} where user_id=1002;
+cqlsh:first_keyspace> update users set pincodes={623441,124551} where user_id=1003;
+cqlsh:first_keyspace> update users set pincodes={342844,124551} where user_id=1004;
+cqlsh:first_keyspace> update users set pincodes={342444,532251} where user_id=1005;
+cqlsh:first_keyspace>
+cqlsh:first_keyspace> select * from users where pincodes contains 124551;
+
+ user_id | country | name    | pincodes
+---------+---------+---------+------------------
+    1004 |      US |  Miller | {124551, 342844}
+    1001 |      UK |   David | {124551, 342444}
+    1003 |      IN | Sandeep | {124551, 623441}
+
+(3 rows)
+cqlsh:first_keyspace> copy employee(emp_id,name,designation) to 'c:/test/emp.csv';
+Using 3 child processes
+Can't open 'c:/test/emp.csv' for writing: [Errno 2] No such file or directory: 'c:/test/emp.csv'
+cqlsh:first_keyspace> copy employee(emp_id,name,designation) to 'c:/test/emp.csv';
+Using 3 child processes
+
+Starting copy of first_keyspace.employee with columns [emp_id, name, designation].
+Processed: 3 rows; Rate:       2 rows/s; Avg. rate:       1 rows/s
+3 rows exported to 1 files in 2.360 seconds.
+cqlsh:first_keyspace> create table employee_1(id int,name text,des text,primary key(id));
+cqlsh:first_keyspace> select * from employee_1
+                  ... ;
+
+ id | des | name
+----+-----+------
+
+(0 rows)
+cqlsh:first_keyspace> copy employee_1(id,name,des) from 'c:/test/emp.csv';
+Using 3 child processes
+
+Starting copy of first_keyspace.employee_1 with columns [id, name, des].
+Process ImportProcess-4:       2 rows/s; Avg. rate:       2 rows/s
+PTProcess ImportProcess-5:
+raceback (most recent call last):
+rocess ImportProcess-6:
+ TT File "C:\Python27\lib\multiprocessing\process.py", line 267, in _bootstrap
+raceback (most recent call last):
+raceback (most recent call last):
+    File "C:\Python27\lib\multiprocessing\process.py", line 267, in _bootstrap
+   self.run()
+ File "C:\Python27\lib\multiprocessing\process.py", line 267, in _bootstrap
+      self.run()
+ File "C:\apache-cassandra-3.11.10\bin\..\pylib\cqlshlib\copyutil.py", line 2330, in run
+   self.run()
+   File "C:\apache-cassandra-3.11.10\bin\..\pylib\cqlshlib\copyutil.py", line 2330, in run
+ File "C:\apache-cassandra-3.11.10\bin\..\pylib\cqlshlib\copyutil.py", line 2330, in run
+    self.close()
+    File "C:\apache-cassandra-3.11.10\bin\..\pylib\cqlshlib\copyutil.py", line 2334, in close
+   self.close()
+   self.close()
+      self._session.cluster.shutdown()
+ File "C:\apache-cassandra-3.11.10\bin\..\pylib\cqlshlib\copyutil.py", line 2334, in close
+ File "C:\apache-cassandra-3.11.10\bin\..\pylib\cqlshlib\copyutil.py", line 2334, in close
+      self._session.cluster.shutdown()
+ File "C:\apache-cassandra-3.11.10\bin\..\lib\cassandra-driver-internal-only-3.11.0-bb96859b.zip\cassandra-driver-3.11.0-bb96859b\cassandra\cluster.py", line 1259, in shutdown
+   self._session.cluster.shutdown()
+   File "C:\apache-cassandra-3.11.10\bin\..\lib\cassandra-driver-internal-only-3.11.0-bb96859b.zip\cassandra-driver-3.11.0-bb96859b\cassandra\cluster.py", line 1259, in shutdown
+ File "C:\apache-cassandra-3.11.10\bin\..\lib\cassandra-driver-internal-only-3.11.0-bb96859b.zip\cassandra-driver-3.11.0-bb96859b\cassandra\cluster.py", line 1259, in shutdown
+    self.control_connection.shutdown()
+  File "C:\apache-cassandra-3.11.10\bin\..\lib\cassandra-driver-internal-only-3.11.0-bb96859b.zip\cassandra-driver-3.11.0-bb96859b\cassandra\cluster.py", line 2850, in shutdown
+     self._connection.close()
+   self.control_connection.shutdown()
+   File "C:\apache-cassandra-3.11.10\bin\..\lib\cassandra-driver-internal-only-3.11.0-bb96859b.zip\cassandra-driver-3.11.0-bb96859b\cassandra\io\asyncorereactor.py", line 373, in close
+     self.control_connection.shutdown()
+ File "C:\apache-cassandra-3.11.10\bin\..\lib\cassandra-driver-internal-only-3.11.0-bb96859b.zip\cassandra-driver-3.11.0-bb96859b\cassandra\cluster.py", line 2850, in shutdown
+   AsyncoreConnection.create_timer(0, partial(asyncore.dispatcher.close, self))
+    File "C:\apache-cassandra-3.11.10\bin\..\lib\cassandra-driver-internal-only-3.11.0-bb96859b.zip\cassandra-driver-3.11.0-bb96859b\cassandra\cluster.py", line 2850, in shutdown
+ File "C:\apache-cassandra-3.11.10\bin\..\lib\cassandra-driver-internal-only-3.11.0-bb96859b.zip\cassandra-driver-3.11.0-bb96859b\cassandra\io\asyncorereactor.py", line 335, in create_timer
+   self._connection.close()
+      self._connection.close()
+   cls._loop.add_timer(timer)
+ File "C:\apache-cassandra-3.11.10\bin\..\lib\cassandra-driver-internal-only-3.11.0-bb96859b.zip\cassandra-driver-3.11.0-bb96859b\cassandra\io\asyncorereactor.py", line 373, in close
+ A  File "C:\apache-cassandra-3.11.10\bin\..\lib\cassandra-driver-internal-only-3.11.0-bb96859b.zip\cassandra-driver-3.11.0-bb96859b\cassandra\io\asyncorereactor.py", line 373, in close
+ttributeError: 'NoneType' object has no attribute 'add_timer'
+   AsyncoreConnection.create_timer(0, partial(asyncore.dispatcher.close, self))
+     AsyncoreConnection.create_timer(0, partial(asyncore.dispatcher.close, self))
+ File "C:\apache-cassandra-3.11.10\bin\..\lib\cassandra-driver-internal-only-3.11.0-bb96859b.zip\cassandra-driver-3.11.0-bb96859b\cassandra\io\asyncorereactor.py", line 335, in create_timer
+   File "C:\apache-cassandra-3.11.10\bin\..\lib\cassandra-driver-internal-only-3.11.0-bb96859b.zip\cassandra-driver-3.11.0-bb96859b\cassandra\io\asyncorereactor.py", line 335, in create_timer
+   cls._loop.add_timer(timer)
+ A   cls._loop.add_timer(timer)
+ttributeError: 'NoneType' object has no attribute 'add_timer'
+AttributeError: 'NoneType' object has no attribute 'add_timer'
+Processed: 3 rows; Rate:       1 rows/s; Avg. rate:       1 rows/s
+3 rows imported from 1 files in 2.012 seconds (0 skipped).
+cqlsh:first_keyspace> select * from employee_1;
+
+ id   | des        | name
+------+------------+--------
+ 1001 |  Developer | Arvind
+ 1003 |  Architect | Ramesh
+ 1002 | Accountant |  Surya
+
+(3 rows)
+cqlsh:first_keyspace>
+cqlsh:first_keyspace>
