@@ -1142,3 +1142,91 @@ cqlsh:first_keyspace> select * from employee_1;
 (3 rows)
 cqlsh:first_keyspace>
 cqlsh:first_keyspace>
+
+
+
+
+
+
+Microsoft Windows [Version 10.0.19042.746]
+(c) 2020 Microsoft Corporation. All rights reserved.
+
+C:\Users\Administrator>ccm status
+No currently active cluster (use ccm cluster switch)
+
+C:\Users\Administrator>ccm create mycluster -v 3.11.10
+17:41:47,243 ccm INFO Downloading http://archive.apache.org/dist/cassandra/3.11.10/apache-cassandra-3.11.10-bin.tar.gz to c:\users\admini~1\appdata\local\temp\ccm-wtdsyz.tar.gz (36.515MB)
+  38289255  [100.00%]17:42:16,996 ccm INFO Extracting c:\users\admini~1\appdata\local\temp\ccm-wtdsyz.tar.gz as version 3.11.10 ...
+Current cluster is now: mycluster
+
+C:\Users\Administrator>ccm status
+Cluster: 'mycluster'
+--------------------
+No node in this cluster yet
+
+C:\Users\Administrator>ccm populate -n 3
+
+C:\Users\Administrator>ccm status
+Cluster: 'mycluster'
+--------------------
+node1: DOWN (Not initialized)
+node3: DOWN (Not initialized)
+node2: DOWN (Not initialized)
+
+C:\Users\Administrator>ccm start
+Traceback (most recent call last):
+  File "C:\Python27\Scripts\ccm.py", line 112, in <module>
+    cmd.run()
+  File "C:\Python27\lib\site-packages\ccmlib\cmds\cluster_cmds.py", line 510, in run
+    allow_root=self.options.allow_root) is None:
+  File "C:\Python27\lib\site-packages\ccmlib\cluster.py", line 390, in start
+    common.assert_socket_available(itf)
+  File "C:\Python27\lib\site-packages\ccmlib\common.py", line 521, in assert_socket_available
+    raise UnavailableSocketError("Inet address %s:%s is not available: %s; a cluster may already be running or you may need to add the loopback alias" % (addr, port, msg))
+ccmlib.common.UnavailableSocketError: Inet address 127.0.0.1:9042 is not available: [Errno 10013] An attempt was made to access a socket in a way forbidden by its access permissions; a cluster may already be running or you may need to add the loopback alias
+
+C:\Users\Administrator>ccm start
+Started: node1 with pid: 3620
+Started: node3 with pid: 6136
+Started: node2 with pid: 5100
+
+C:\Users\Administrator>ccm node1 show
+node1: UP
+       cluster=mycluster
+       auto_bootstrap=False
+       thrift=('127.0.0.1', 9160)
+       binary=('127.0.0.1', 9042)
+       storage=('127.0.0.1', 7000)
+       jmx_port=7100
+       remote_debug_port=0
+       byteman_port=0
+       initial_token=-9223372036854775808
+       pid=3620
+
+C:\Users\Administrator>ccm node2 show
+node2: UP
+       cluster=mycluster
+       auto_bootstrap=False
+       thrift=('127.0.0.2', 9160)
+       binary=('127.0.0.2', 9042)
+       storage=('127.0.0.2', 7000)
+       jmx_port=7200
+       remote_debug_port=0
+       byteman_port=0
+       initial_token=-3074457345618258603
+       pid=5100
+
+C:\Users\Administrator>ccm node3 show
+node3: UP
+       cluster=mycluster
+       auto_bootstrap=False
+       thrift=('127.0.0.3', 9160)
+       binary=('127.0.0.3', 9042)
+       storage=('127.0.0.3', 7000)
+       jmx_port=7300
+       remote_debug_port=0
+       byteman_port=0
+       initial_token=3074457345618258602
+       pid=6136
+
+C:\Users\Administrator>
