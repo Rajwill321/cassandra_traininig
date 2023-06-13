@@ -1,0 +1,257 @@
+https://cloud.cdp.rpsconsulting.in/console/#/
+https://drive.google.com/drive/folders/11QxXLzeV3tnBscN_r_g0jXKWtBq_Lb5y?usp=sharing
+
+cqlsh
+
+create keyspace test_keyspace with replication={'class':'SimpleStrategy','replication_factor':2};
+
+cqlsh> use test_keyspace;
+
+cqlsh:test_keyspace> create table customer(cust_id int,name text,balance double,primary key(cust_id));
+
+insert into customer(cust_id,name,balance) values(5001,'Arvind',30000);
+insert into customer(cust_id,name,balance) values(5002,'Deva',20000);
+insert into customer(cust_id,name,balance) values(5003,'Surya',40000);
+insert into customer(cust_id,name,balance) values(5004,'Raghav',30000);
+insert into customer(cust_id,name,balance) values(5005,'Arun',70000);
+
+
+nodetool -p 7100 getendpoints test_keyspace customer 5001
+
+C:\Users\Administrator>nodetool -p 7100 flush
+
+C:\Users\Administrator>nodetool -p 7200 flush
+
+C:\Users\Administrator>nodetool -p 7300 flush
+
+
+path=c:\apache-cassandra-3.11.10\tools\bin;%path%
+
+sstabledump C:\Users\Administrator\.ccm\mycluster\node1\data0\test_keyspace\customer-5ecebea009a711ee897883b56eedf975\md-1-big-Data.db
+
+
+sstabledump C:\Users\Administrator\.ccm\mycluster\node2\data0\test_keyspace\customer-5ecebea009a711ee897883b56eedf975\md-1-big-Data.db
+
+sstabledump C:\Users\Administrator\.ccm\mycluster\node3\data0\test_keyspace\customer-5ecebea009a711ee897883b56eedf975\md-1-big-Data.db
+
+
+Exercise:
+
+Create a keyspace called next_keyspace with replication factor of 3.
+Create a table called employee within this key space with the following fields.
+
+emp_id  int primary key
+name text
+designation text
+
+data:
+
+emp_id  name    designation
+2001    Raghav  Developer
+2002    Arun    Accountant
+2003    Priya   Architect
+
+Flush each of the nodes and check the sstable content of the employee table in each node.
+Make sure that each row is replicated in all 3 nodes.
+Also check whether the content of sstable matches with the output of nodetool getendpoints.
+
+
+ccm node1 ring
+
+<dependencies>
+  <!-- https://mvnrepository.com/artifact/com.datastax.cassandra/cassandra-driver-core -->
+<dependency>
+    <groupId>com.datastax.cassandra</groupId>
+    <artifactId>cassandra-driver-core</artifactId>
+    <version>3.11.0</version>
+</dependency>
+  
+  </dependencies>
+  
+  package com.jpmc.training.cassandra;
+
+import java.util.List;
+
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
+
+public class SelectTest {
+
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        Cluster cluster=Cluster.builder().addContactPoint("127.0.0.1").withPort(9042).build();
+        Session session=cluster.connect();//similar to opening a cqlsh session
+        String query="select cust_id,name,balance from test_keyspace.customer";
+        ResultSet rs=session.execute(query);
+        List<Row> list=rs.all();
+        list.forEach(row->{
+            System.out.println(row.getInt(0)+"\t"+row.getString(1)+"\t"+row.getDouble(2));
+        });
+        session.close();
+        cluster.close();
+
+    }
+
+}
+
+
+package com.jpmc.training.cassandra;
+
+import java.util.List;
+
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
+
+public class InsertTest {
+
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        Cluster cluster=Cluster.builder().addContactPoint("127.0.0.1").withPort(9042).build();
+        Session session=cluster.connect();//similar to opening a cqlsh session
+        String query="insert into test_keyspace.customer(cust_id,name,balance) values(?,?,?)";
+        session.execute(query,8001,"Surya",8000.23);
+        System.out.println("row added");
+        session.close();
+        cluster.close();
+
+    }
+
+}
+
+
+
+ccm stop
+
+cassandra
+
+create  function max(first int,second int)
+returns null on null input
+returns int
+language java
+as $$return Math.max(first,second); $$;
+
+cqlsh:first_keyspace> describe functions;
+
+
+
+cqlsh:first_keyspace> describe function max;
+
+cqlsh:first_keyspace> create table sample(id int,a int,b int,primary key(id));
+cqlsh:first_keyspace> insert into sample(id,a,b) values(1,42,55);
+cqlsh:first_keyspace> insert into sample(id,a,b) values(2,22,18);
+cqlsh:first_keyspace> select a,b,max(a,b) from sample;
+
+authenticator: PasswordAuthenticator
+
+cqlsh -u cassandra -p cassandra
+
+cassandra@cqlsh> create role user1 with login=true and password='pass@1';
+
+cassandra@cqlsh> exit;
+C:\Users\Administrator>cqlsh -u user1 -p pass@1
+
+
+user1@cqlsh> use first_keyspace;
+user1@cqlsh:first_keyspace> select * from employee;
+
+user1@cqlsh:first_keyspace> exit
+C:\Users\Administrator>cqlsh -u cassandra -p cassandra
+
+cassandra@cqlsh> grant select on first_keyspace.employee to user1;
+cassandra@cqlsh> describe keyspaces;
+
+first_keyspace  system_auth  system_distributed
+system_schema   system       system_traces
+
+cassandra@cqlsh> use system_auth;
+cassandra@cqlsh:system_auth> describe tables;
+
+resource_role_permissons_index  role_permissions  role_members  roles
+
+cassandra@cqlsh:system_auth> select * from roles;
+
+cassandra@cqlsh:system_auth> select * from role_permissions;
+
+cassandra@cqlsh:system_auth>
+
+cassandra@cqlsh:system_auth> exit;
+C:\Users\Administrator>cqlsh -u user1 -p pass@1
+ 
+user1@cqlsh> use first_keyspace;
+user1@cqlsh:first_keyspace> select * from employee;
+
+user1@cqlsh:first_keyspace> insert into employee(emp_id,name,designation) values(1004,'Suresh','Developer');
+
+user1@cqlsh:first_keyspace> exit
+C:\Users\Administrator>cqlsh -u cassandra -p cassandra
+
+cassandra@cqlsh> grant all on first_keyspace.employee to user1;
+
+cassandra@cqlsh> select * from system_auth.role_permissions;
+
+cassandra@cqlsh> exit
+C:\Users\Administrator>cqlsh -u user1 -p pass@1
+
+
+user1@cqlsh> use first_keyspace;
+user1@cqlsh:first_keyspace> insert into employee(emp_id,name,designation) values(1155,'Deva','Architect');
+
+
+C:\Users\Administrator>cqlsh -u cassandra -p cassandra
+
+
+cassandra@cqlsh> create role admin with login=true and password='admin@123' and superuser=true;
+
+cassandra@cqlsh> exit
+C:\Users\Administrator>cqlsh -u admin -p admin@123
+
+admin@cqlsh> alter role cassandra with login=false and superuser=false;
+exit
+cqlsh -u cassandra -p cassandra
+
+
+package com.jpmc.training.cassandra;
+
+import java.util.List;
+
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
+
+public class SecureSelectTest {
+
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        Cluster cluster=Cluster.builder().addContactPoint("127.0.0.1").withPort(9042).
+                withCredentials("user1", "pass@1").
+                build();
+        Session session=cluster.connect();//similar to opening a cqlsh session
+        String query="select emp_id,name,designation from first_keyspace.employee";
+        ResultSet rs=session.execute(query);
+        List<Row> list=rs.all();
+        list.forEach(row->{
+            System.out.println(row.getInt(0)+"\t"+row.getString(1)+"\t"+row.getString(2));
+        });
+        session.close();
+        cluster.close();
+
+    }
+
+}
+
+
+https://tcheck.co/2nyP77
+
+periasamy.subramanian@gmail.com
+9880372634
+
+
+Cassandra Definitive Guide by Eben Hewitt
+
+
+
