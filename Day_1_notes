@@ -1,0 +1,409 @@
+No sql DB:
+
+Supports non tabular format of storing the data.
+does not support joins/aggregations/transactions.
+
+Provides flexible schema and scale easily with large amount of data.
+
+Types of No Sql DBs.
+
+Document Oriented DB:-Stores each data(row) as a document similar to a json object.
+
+Example: Mongo DB
+Columnar DB:
+Instead of organizing information into rows, it organizes in columns.
+
+emp_id	name	designation
+1001	Arvind	Developer
+1002	Deva	Accountant
+1003	Surya	Architect
+
+
+row oriented format:
+
+1001,Arvind,Developer;1002,Deva,Accountant;1003,Surya,Architect
+
+columnar format
+
+1001,1002,1003;Arvind,Deva,Surya;Developer,Accountant,Architect
+
+Columnar format can significantly reduce the amount of data fetched from disk by allowing access to 
+only the columns that are relevant for the particular query.
+
+Supports efficient compression techniques.
+
+Aggregation queries are more efficient.
+
+Scalability is definitely very good in columnar dbs. They can be expanded infinitely across large clusters
+of machines, even numbering in thousands.
+
+Examples: Cassandra, HBase
+
+
+
+Key Value DB :
+
+Each data is stored as a key value pair.
+
+Examples: Redis, AWS Dynamo DB
+
+Graph DB:
+Stores the data in Graph format(vertices and edges)
+
+Examples: Neo 4j, AWS Neptune
+
+
+Cassandra combines the best features Google Big Table storage and AWS Dynamo
+
+Common usecases
+
+1. writes(inserts) exceed reads by a larger margin
+
+2. Data is rarely updated/deleted
+
+3. Read Access is by a known primary key
+
+4. Data can be partitioned through a key that allows database to spread across multiple nodes.
+
+5. No need for joins/aggregations/transactions.
+
+Distributed Data:
+
+Assume that there are 10 rows with a primary key ranging from 1 to 10.
+Also assume that there are 6 nodes in the cluster and the replication factor is 3.
+Replication factor denotes how many copies of data, available.
+
+node 1------------1,2,3,4,5
+node 2------------6,7,8,9
+node 3------------10,1,2,3,4
+node 4------------5,6,7,8
+node 5------------9,10,1,2,3,4
+node 6------------5,6,7,8,9,10
+
+Common type of applications where cassandra is useful:
+
+1. Transaction Logging
+2. Weather service history
+3. IOT of cars/trucks
+4. Storing Health Tracker Data
+
+Cassandra is written in Java.
+For Running Cassandra, JRE is required.
+
+JRE-----------Java Runtime Environment----------JVM+System Libraries
+
+JVM-----------Java Virtual Machine---------Interprets java byte code into runtime instructions.
+
+setting up cassandra:
+
+1. Download Jdk 1.8 from https://www.oracle.com/in/java/technologies/javase/javase8-archive-downloads.html#license-lightbox
+and install it.
+2. set the JAVA_HOME environment variable.
+
+3. Download cassandra 3.11 from https://archive.apache.org/dist/cassandra/3.11.4/apache-cassandra-3.11.4-bin.tar.gz
+and extract it c:\.
+
+4. Download python 2.7 from https://www.python.org/ftp/python/2.7/python-2.7.amd64.msi and install it.
+
+5. Add %JAVA_HOME%\bin,c:\apache-cassandra-3.11.4\bin and c:\Python27 to the path.
+
+6. start the cassandra server
+open a new command window and run the command cassandra.
+
+7. start the cassandra client(cqlsh-----------cassandra query language shell)
+
+open a new command window and run the command cqlsh.
+
+
+column-----------------key value pair
+row--------------------collection of columns identified by a primary key
+table/collection-------collection of rows
+keyspace---------------collection of tables---similar to database in rdbms---each keyspace spreads across
+			multiple nodes in the cluster.
+cluster--------------physically collection of nodes(machines)-----collection of keyspaces.
+
+
+SimpleStragey---This strategy is used to deploy your cluster in only one data center. Suitable for 
+development and testing enviornments.
+
+Network Topology Strategy-----Used when you want to deploy the cassandra cluster in multiple data
+centres. Suitable for production.
+
+Primary key= partition key+clustering key
+
+The partition key decides which row goes to which node.
+
+
+
+
+When a primary key has only one column, it is treated as the partition key(it treats there is no clutering
+key)
+
+clustering key: decides how the data is stored in a single node.
+
+
+
+books_by_author_table
+
+author_name	text
+publish_year	int
+book_id		uuid(universally unique identifier)
+book_name	text
+rating		float
+
+primary key(author_name,publish_year,book_id)
+
+partition key----author_name-----------all the rows with the same author name go to the same node.
+clustering key-----publish_year and book_id
+
+Within the single node, the rows sorted in the ascending order of publish_year and if the publish_year
+is same for multiple rows of the same partition key, then they are sorted based on the ascending order of
+book_id.
+
+
+cassandra data types:
+
+Integers:
+
+tiny int-----1 byte
+small int----2 bytes
+int----------4 bytes
+long --------8 bytes
+
+
+Floating Point:
+
+float---------4 bytes(IEEE)
+double--------8 bytes(IEEE)
+
+In IEEE standard, 1.8 value is stored as 1.7999999999
+
+decimal--------------value in precision----------used to store currency
+
+
+
+textual:
+
+text / varchar
+
+collection:
+
+set---------stores collection of elements without duplicates & order is not guaranteed
+list--------allows duplicates & order is guaranteed
+map---------collection of key value pairs. key should be unique.
+
+
+User Defined Type (UDT):
+
+collection of multiple data fields can be created as a data type.
+
+Most commonly used to use the same set of fields in multiple tables.
+
+Each field has a name and value.
+
+The fields used to create a UDT can be any valid cassandra type including collections and other existing
+UDTs.
+
+
+address_type
+
+door_no		int
+street_name	text
+location	text
+city		text
+
+
+frozen keyword:
+
+A frozen value serializes multiple components into a single value.
+
+If a field is of frozen type, it can be modified only as a whole and individual fields of this field 
+can't be modified.
+
+When a table contains a field which is a collection of UDT, it is mandatory that is should be frozen.
+
+
+Secondary Indexes:
+
+Searching based on non primary key columns has more overhead.
+
+To address this, secondary indexes are used.
+
+Cassandra automatically creates an index for each primary key. This is called the primary index.
+
+Secondary indexes are created manually if there is a need for searching based on non primary key column.
+
+Assume that there is a table called users which has the following fields.
+
+user_id	text	primary key
+name	text
+country	text
+
+create table users(user_id text primary key,name text,country text);
+
+create index country_idx on users(country);
+
+For this command, cassandra internaly creates a hidden table in each node with the following structure.
+
+create table country_idx(country text,user_id text,primary key(country,user_id))
+
+ie in a node called node-1 if the data available is 
+
+user_id_1	FR	username	interest
+user_id_2	US	-----		-----
+user_id_3	US	------		-----
+
+
+the index table in node will have the following data
+
+FR	user_id_1
+US	user_id_2,user_id_3
+
+
+CRUD operations on tables with secondary indexes :
+
+Select:
+
+Every query on secondary index is forwarded to all the nodes in the cluster. Results are then merged
+and returned to the client.
+
+Insert:
+
+The index just creates a new entry in the hidden index table.
+
+Update:
+Memtable is a temporary  table in memory maintained for cassandra for storing the data.
+When there is an update operation, if there is an entry in the memtable, it replaces that.
+With the hidden table, the entry for the previous index value is removed and cassandra adds 
+a new one for the new index value.
+
+Delete: Writes a tombstone(marker for deletion) for the index entry
+
+Limitations of secondary indexes:
+
+1. secondary indexes should not be used on columns with very high cardinality(more distinct values).
+
+2. secondary indexes should never be used on columns which are updated frequently.
+
+Limitations on queries using secondary indexes:
+1. we can't use IN predicate on secondary indexed columns.
+where country in ('US','UK')----------can't be used
+
+2. Range operators like < and > are not allowed
+
+3. order by is not supported. But in collection, contains and containsKey are supported.
+
+copy data from one table to another table:
+
+1. export data from source table to some location.
+	copy employee(list of columns) to 'c:/test/emp.csv'
+
+2. create the target table
+
+3. import data from the location specified in step 1
+
+copy employee_1(list of columns) from 'c:/test/emp.csv'
+
+
+
+Cassandra Cluster:
+
+Cassandra Cluster is a collection of nodes that represents a single system.
+A keyspace is distributed across multiple nodes in the cluster based on the replication factor.
+
+Replication factor denotes the number of copies of data.
+
+Cluster is the outermost storage unit in cassandra.
+
+column<-----row<---------table<-----------keyspace<------------cluster
+
+cassandra cluster does not follow a master slave architecture.
+
+
+						   |------>node 1
+cassandra client-------------->gateway node(node4)-|------>node 2
+						   |------>node 3
+						   |------>node 4 
+
+The client sends a request to one of the nodes in the cluster. The node which receives the request
+is called gateway/co-ordinator/edgy node. It forwards that request to all other nodes in the cluster.
+
+cassandra server by default runs at port 9042.
+
+
+cassandra cluster with  3 nodes.
+
+		ip-address		port
+node-1		127.0.0.1		9042
+
+node-2		127.0.0.2		9042
+
+node-3		127.0.0.3		9042
+
+
+
+steps:
+
+1. Stop any cassandra or cqlsh instances if they are running.
+
+2. Download Jdk 1.8 from https://www.oracle.com/in/java/technologies/javase/javase8-archive-downloads.html#license-lightbox
+and install it.
+3. set the JAVA_HOME environment variable.
+4. ant is a popular java based build tool.To run cassandra cluster manager, ant tool is required.
+Download ant from https://dlcdn.apache.org//ant/binaries/apache-ant-1.9.16-bin.tar.gz
+and extract it to c:\.
+
+5. set the ANT_HOME environment variable.
+
+6. Add %ANT_HOME%\bin to the path.
+
+7. ccm (cassandra cluster manager) is a python based tool.Download ccm using pip(python install package).
+
+pip install ccm
+
+8. ccm uses python based system utilities to start the cassandra nodes and access the os processes.
+So need to install python psutil package to access the system processes.
+
+pip install psutil
+
+9. This step is not required in linux/mac-os. Required only in windows.
+
+ccm accesses the system processes for starting the cassandra nodes. To enable this, the windows os
+should give permission for any one to access the system processes.
+
+Open windows power shell and execute the following command.
+
+ Set-ExecutionPolicy Unrestricted
+ 
+
+10. ccm is available as a .py file.
+To execute the ccm command without the .py extension, add the .py extension to the PATHEXT environment 
+variable.
+
+11. check the status of the cluster by running the following command in a new command window.
+
+ccm status
+
+12. Update the etc/hosts file in windows to add more ip addresses.
+
+open notepad in admin mode , open the file c:\windows\system32\drivers\etc\hosts and update it as shown
+below.
+
+127.0.0.1   127.0.0.2
+127.0.0.1   127.0.0.3
+127.0.0.1   127.0.0.4
+
+13. set up the cluster with the following command.
+
+ccm create cluster-name	-v cassandra-version
+
+ccm create mycluster -v 3.11.10
+
+This would have downloaded apache cassandra 3.11.10 under ~/.ccm/repository directory.
+
+14. Add 3 nodes to the cluster using the following command.
+ccm populate -n 3
+
+conf/cassandra.yaml is the config file for each cassandra node.
+15. start the nodes of the cluster using the following command
+ccm start
