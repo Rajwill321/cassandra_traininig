@@ -1,0 +1,71 @@
+Write Request to Cassandra Cluster:
+
+Write request from the client goes to the co-ordinator node which sends the write request
+to N different nodes based on the replication factor.
+
+Now the co-ordinator node waits for N successes and then returns success to the client.
+
+Each of N nodes gets the write request in the form of "Row Mutation Message"
+
+A node performs 2 actions for each Row Mutation Message.
+
+1. appends the mutation to the commit log for transactional purpose
+2. updates the memtable with the change
+
+At last , a full memtable structure and data are written to a disk based structure called sstable.
+
+SSTable------------Sorted String Table.
+
+SSTable is the persistence format of cassandra table rows stored in the disk.
+In the data directory for the table, the file which ends with Data.db is the sstable file.
+
+nodetool:
+nodetool  is a command line tool to manage the cassandra cluster.
+
+
+Exercise:
+
+Create a keyspace called next_keyspace with replication factor of 3.
+Create a table called employee within this key space with the following fields.
+
+emp_id	int primary key
+name text
+designation text
+
+data:
+
+emp_id	name	designation
+2001	Raghav	Developer
+2002	Arun	Accountant
+2003	Priya	Architect
+
+Flush each of the nodes and check the sstable content of the employee table in each node.
+Make sure that each row is replicated in all 3 nodes.
+Also check whether the content of sstable matches with the output of nodetool getendpoints.
+
+Toekn:
+
+Cassandra data is partitioned based on token of the row's partition key.
+
+The token is generated using a Hash function.
+
+Token's value ranges from -2^63-1 to +2^63
+
+Cassandra represents the data managed by the cluster as a ring.
+
+Each node in the ring is assinged a range of data described by a token which determines its position in the ring.
+
+A node claims ownership of the range of values less than or equal to each token and greater than
+the last token of the previous node, known as the token range.
+
+Authentication & Authorization:
+
+steps:
+
+1. stop any cassandra or cqlsh instances if they are running.
+
+2. change the authenticator property in cassandra.yaml file to PasswordAuthenticator.
+
+3. change the authorizer property in cassandra.yaml to CassandraAuthorizer
+
+4. save the cassandra.yaml file and start cassandra server
