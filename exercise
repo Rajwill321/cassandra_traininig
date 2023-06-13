@@ -1,0 +1,241 @@
+##
+##
+
+Exercise:
+
+Create a keyspace called next_keyspace with replication factor of 3.
+Create a table called employee within this key space with the following fields.
+
+emp_id  int primary key
+name text
+designation text
+
+data:
+
+emp_id  name    designation
+2001    Raghav  Developer
+2002    Arun    Accountant
+2003    Priya   Architect
+
+Flush each of the nodes and check the sstable content of the employee table in each node.
+Make sure that each row is replicated in all 3 nodes.
+Also check whether the content of sstable matches with the output of nodetool getendpoints.
+
+
+##
+
+C:\Users\Administrator>cqlsh
+
+WARNING: console codepage must be set to cp65001 to support utf-8 encoding on Windows platforms.
+If you experience encoding problems, change your console codepage with 'chcp 65001' before starting cqlsh.
+
+Connected to mycluster at 127.0.0.1:9042.
+[cqlsh 5.0.1 | Cassandra 3.11.10 | CQL spec 3.4.4 | Native protocol v4]
+Use HELP for help.
+WARNING: pyreadline dependency missing.  Install to enable tab completion.
+cqlsh> create keyspace next_keyspace with replication={'class':'SimpleStrategy','replication_factor':3};
+cqlsh> user next_keyspace;
+SyntaxException: line 1:0 no viable alternative at input 'user' ([user]...)
+cqlsh> use next_keyspace;
+cqlsh:next_keyspace> create table employee(emp_id int,name text,designation text,primary key(emp_id));
+cqlsh:next_keyspace> insert into employee(emp_id,name,designation) values(2001,'Raghav','Developer');
+cqlsh:next_keyspace> insert into employee(emp_id,name,designation) values(2002,'Arun','Accountant');
+cqlsh:next_keyspace> insert into employee(emp_id,name,designation) values(2003,'Priya','Architect');
+cqlsh:next_keyspace>
+cqlsh:next_keyspace> select * from employee;
+
+ emp_id | designation | name
+--------+-------------+--------
+   2003 |   Architect |  Priya
+   2001 |   Developer | Raghav
+   2002 |  Accountant |   Arun
+
+(3 rows)
+cqlsh:next_keyspace> exit
+C:\Users\Administrator>ccm node1 show
+node1: UP
+       cluster=mycluster
+       auto_bootstrap=False
+       thrift=('127.0.0.1', 9160)
+       binary=('127.0.0.1', 9042)
+       storage=('127.0.0.1', 7000)
+       jmx_port=7100
+       remote_debug_port=0
+       byteman_port=0
+       initial_token=-9223372036854775808
+       pid=3620
+
+C:\Users\Administrator>nodetool -p 7100 getendpoints next_keyspace employee 2001
+127.0.0.3
+127.0.0.1
+127.0.0.2
+
+C:\Users\Administrator>nodetool -p 7100 flush
+
+C:\Users\Administrator>nodetool -p 7200 flush
+
+C:\Users\Administrator>nodetool -p 7300 flush
+
+C:\Users\Administrator>sstabledump C:\Users\Administrator\.ccm\mycluster\node1\data0\next_keyspace\employee-0df00fa009ae11ee98f7a924144464d9\md-1-big-Data.db
+[
+  {
+    "partition" : {
+      "key" : [ "2003" ],
+      "position" : 0
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 18,
+        "liveness_info" : { "tstamp" : "2023-06-13T06:13:41.775Z" },
+        "cells" : [
+          { "name" : "designation", "value" : "Architect" },
+          { "name" : "name", "value" : "Priya" }
+        ]
+      }
+    ]
+  },
+  {
+    "partition" : {
+      "key" : [ "2001" ],
+      "position" : 43
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 61,
+        "liveness_info" : { "tstamp" : "2023-06-13T06:13:40.707Z" },
+        "cells" : [
+          { "name" : "designation", "value" : "Developer" },
+          { "name" : "name", "value" : "Raghav" }
+        ]
+      }
+    ]
+  },
+  {
+    "partition" : {
+      "key" : [ "2002" ],
+      "position" : 85
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 103,
+        "liveness_info" : { "tstamp" : "2023-06-13T06:13:40.725Z" },
+        "cells" : [
+          { "name" : "designation", "value" : "Accountant" },
+          { "name" : "name", "value" : "Arun" }
+        ]
+      }
+    ]
+  }
+]
+C:\Users\Administrator>sstabledump C:\Users\Administrator\.ccm\mycluster\node2\data0\next_keyspace\employee-0df00fa009ae11ee98f7a924144464d9\md-1-big-Data.db
+[
+  {
+    "partition" : {
+      "key" : [ "2003" ],
+      "position" : 0
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 18,
+        "liveness_info" : { "tstamp" : "2023-06-13T06:13:41.775Z" },
+        "cells" : [
+          { "name" : "designation", "value" : "Architect" },
+          { "name" : "name", "value" : "Priya" }
+        ]
+      }
+    ]
+  },
+  {
+    "partition" : {
+      "key" : [ "2001" ],
+      "position" : 43
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 61,
+        "liveness_info" : { "tstamp" : "2023-06-13T06:13:40.707Z" },
+        "cells" : [
+          { "name" : "designation", "value" : "Developer" },
+          { "name" : "name", "value" : "Raghav" }
+        ]
+      }
+    ]
+  },
+  {
+    "partition" : {
+      "key" : [ "2002" ],
+      "position" : 85
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 103,
+        "liveness_info" : { "tstamp" : "2023-06-13T06:13:40.725Z" },
+        "cells" : [
+          { "name" : "designation", "value" : "Accountant" },
+          { "name" : "name", "value" : "Arun" }
+        ]
+      }
+    ]
+  }
+]
+C:\Users\Administrator>sstabledump C:\Users\Administrator\.ccm\mycluster\node3\data0\next_keyspace\employee-0df00fa009ae11ee98f7a924144464d9\md-1-big-Data.db
+[
+  {
+    "partition" : {
+      "key" : [ "2003" ],
+      "position" : 0
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 18,
+        "liveness_info" : { "tstamp" : "2023-06-13T06:13:41.775Z" },
+        "cells" : [
+          { "name" : "designation", "value" : "Architect" },
+          { "name" : "name", "value" : "Priya" }
+        ]
+      }
+    ]
+  },
+  {
+    "partition" : {
+      "key" : [ "2001" ],
+      "position" : 43
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 61,
+        "liveness_info" : { "tstamp" : "2023-06-13T06:13:40.707Z" },
+        "cells" : [
+          { "name" : "designation", "value" : "Developer" },
+          { "name" : "name", "value" : "Raghav" }
+        ]
+      }
+    ]
+  },
+  {
+    "partition" : {
+      "key" : [ "2002" ],
+      "position" : 85
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 103,
+        "liveness_info" : { "tstamp" : "2023-06-13T06:13:40.725Z" },
+        "cells" : [
+          { "name" : "designation", "value" : "Accountant" },
+          { "name" : "name", "value" : "Arun" }
+        ]
+      }
+    ]
+  }
+]
+C:\Users\Administrator>
