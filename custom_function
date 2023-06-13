@@ -1,0 +1,48 @@
+C:\Users\Administrator>
+C:\Users\Administrator>cqlsh
+
+WARNING: console codepage must be set to cp65001 to support utf-8 encoding on Windows platforms.
+If you experience encoding problems, change your console codepage with 'chcp 65001' before starting cqlsh.
+
+Connected to Test Cluster at 127.0.0.1:9042.
+[cqlsh 5.0.1 | Cassandra 3.11.10 | CQL spec 3.4.4 | Native protocol v4]
+Use HELP for help.
+WARNING: pyreadline dependency missing.  Install to enable tab completion.
+cqlsh> use first_keyspace
+   ... ;
+cqlsh:first_keyspace> create  function max(first int,second int)
+                  ... returns null on null input
+                  ... returns int
+                  ... language java
+                  ... as $$return Math.max(first,second); $$;
+cqlsh:first_keyspace>
+cqlsh:first_keyspace> describe function;
+
+Keyspace 'function' not found.
+cqlsh:first_keyspace> describe functions;
+
+max(int,int)
+
+cqlsh:first_keyspace> describe function max;
+
+CREATE FUNCTION first_keyspace.max(first int, second int)
+    RETURNS NULL ON NULL INPUT
+    RETURNS int
+    LANGUAGE java
+    AS $$return Math.max(first,second); $$;
+
+cqlsh:first_keyspace> create table sample(id int, a int, b int, primary key(id));
+cqlsh:first_keyspace> insert into sample(id,a,b) values(1,42,55)
+                  ... ;
+cqlsh:first_keyspace> insert into sample(id,a,b) values(2,22,45);
+cqlsh:first_keyspace> select a,b,max(a,b) for sample;
+SyntaxException: line 1:20 mismatched input 'for' expecting K_FROM (...,b,max(a,b) [for]...)
+cqlsh:first_keyspace> select a,b,max(a,b) from sample;
+
+ a  | b  | first_keyspace.max(a, b)
+----+----+--------------------------
+ 42 | 55 |                       55
+ 22 | 45 |                       45
+
+(2 rows)
+cqlsh:first_keyspace>
