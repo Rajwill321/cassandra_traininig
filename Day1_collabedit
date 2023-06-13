@@ -1,0 +1,227 @@
+https://cloud.cdp.rpsconsulting.in/console/#/
+
+
+
+C:\apache-cassandra-3.11.10\bin
+
+%JAVA_HOME%\bin
+
+C:\Python27
+
+C:\Python27\Scripts
+
+cassandra
+
+
+cqlsh
+
+cqlsh> describe keyspaces;
+
+cqlsh> create keyspace first_keyspace with replication={'class':'SimpleStrategy','replication_factor':1};
+cqlsh> describe keyspaces;
+
+
+cqlsh> describe keyspace first_keyspace;
+
+cqlsh> use first_keyspace;
+
+cqlsh:first_keyspace> create table employee(emp_id int,name text,designation text,primary key(emp_id));
+
+
+cqlsh:first_keyspace> describe tables;
+
+qlsh:first_keyspace> describe employee;
+
+cqlsh:first_keyspace> insert into employee(emp_id,name,designation) values(1001,'Arvind','Developer');
+cqlsh:first_keyspace> insert into employee(emp_id,name,designation) values(1002,'Surya','Accountant');
+cqlsh:first_keyspace> insert into employee(emp_id,name,designation) values(1003,'Ramesh','Architect');
+cqlsh:first_keyspace> select * from employee;
+
+
+cqlsh:first_keyspace> select emp_id,name,designation from employee;
+
+
+create table books_by_author(author_name text, publish_year int,
+book_id uuid, book_name text,rating float, primary key(author_name,publish_year,book_id));
+
+cqlsh:first_keyspace> create table x(a int,b int,c text,d text,primary key((a,b),c,d));
+cqlsh:first_keyspace> describe x;
+
+cqlsh:first_keyspace> insert into books_by_author(author_name,publish_year,book_id,book_name,rating) values ('Craig Walls',2001,uuid(),'Spring Action 1.0',4.5);
+
+insert into books_by_author(author_name,publish_year,book_id,book_name,rating) 
+values ('Craig Walls',2005,uuid(),'Spring in Action 2.0',4.4);
+
+insert into books_by_author(author_name,publish_year,book_id,book_name,rating) 
+values ('Craig Walls',2005,uuid(),'Spring in Action 3.0',4.2);
+
+insert into books_by_author(author_name,publish_year,book_id,book_name,rating) 
+values ('Yaswant Kanetkar',2001,uuid(),'Let us C',4.4);
+
+insert into books_by_author(author_name,publish_year,book_id,book_name,rating) 
+values ('Yaswant Kanetkar',2007,uuid(),'Exploring C',4.2);
+insert into books_by_author(author_name,publish_year,book_id,book_name,rating) 
+values ('Yaswant Kanetkar',2009,uuid(),'Exploring C++',4.1);
+
+cqlsh:first_keyspace> alter table books_by_author add emails set<text>;
+cqlsh:first_keyspace> describe books_by_author;
+
+cqlsh:first_keyspace> update books_by_author set emails={'craig@yahoo.com','walls@gmail.com','walls@gmail.com'} where author_name='Craig Walls' and publish_year=2001 and book_id=2ff3535b-38d6-4ef5-b1cb-59f584e6acc6;
+
+
+
+
+
+alter table books_by_author add phone_numbers list<text>;
+
+update books_by_author set phone_numbers=['9442772634','9880372634'] where author_name='Craig Walls' and publish_year=2001 and book_id=2ff3535b-38d6-4ef5-b1cb-59f584e6acc6;
+
+
+
+cqlsh:first_keyspace> delete phone_numbers[1] from books_by_author where author_name='Craig Walls' and publish_year=2001 and book_id=2ff3535b-38d6-4ef5-b1cb-59f584e6acc6;
+cqlsh:first_keyspace> select * from books_by_author;
+
+
+cqlsh:first_keyspace> alter table books_by_author add family_members map<text,text>;
+
+cqlsh:first_keyspace> update books_by_author set family_members={'wife':'Teresa','son':'David'} where author_name='Craig Walls' and
+publish_year=2001 and book_id=2ff3535b-38d6-4ef5-b1cb-59f584e6acc6;
+cqlsh:first_keyspace> select * from books_by_author;
+
+update books_by_author set family_members=family_members+{'father':'Peter'} where author_name='Craig Walls' and 
+publish_year=2001 and book_id=2ff3535b-38d6-4ef5-b1cb-59f584e6acc6;
+
+select * from books_by_author;
+
+cqlsh:first_keyspace> update books_by_author set family_members=family_members-{'father'} where author_name='Craig Walls' and publish_year=2001 and book_id=2ff3535b-38d6-4ef5-b1cb-59f584e6acc6;
+cqlsh:first_keyspace> select * from books_by_author;
+
+cqlsh:first_keyspace> create type address_type(door_no int,street_name text,location text,city text);
+cqlsh:first_keyspace> describe types;
+
+address_type
+
+cqlsh:first_keyspace> describe type address_type;
+
+cqlsh:first_keyspace> create table customer(cust_id int,name text,current_address address_type,primary key(cust_id));
+
+
+cqlsh:first_keyspace> insert into customer (cust_id,name,current_address) values (6001,'Arvind',{door_no:23,street_name:'G-10th Street',location:'Ulsoor',city:'Bangalore'});
+cqlsh:first_keyspace> insert into customer (cust_id,name,current_address) values (6002,'Rajiv',{door_no:123,street_name:'Nethaji Road',location:'Malad East',city:'Mumbai'});
+cqlsh:first_keyspace> select * from customer;
+
+cqlsh:first_keyspace> update customer set current_address={door_no:523,street_name:'G-10th Street',location:'Ulsoor',city:'Bangalore'} where cust_id=6001;
+cqlsh:first_keyspace> select * from customer;
+
+cqlsh:first_keyspace> update customer set current_address.location='Malad West' where cust_id=6002;
+cqlsh:first_keyspace> select * from customer;
+
+cqlsh:first_keyspace> create table emp(id int,name text,address frozen<address_type>,primary key(id));
+
+cqlsh:first_keyspace> insert into emp(id,name,address) values (5001,'Rakesh',{door_no:11,street_name:'G-10th street',location:'Panjagutta',city:'Hyderabad'});
+                
+cqlsh:first_keyspace> update emp set address.location='Ameerpet' where id=5001;
+
+cqlsh:first_keyspace> update emp set address={door_no:11,street_name:'G-10th street',location:'Ameerpet',city:'Hyderabad'} where id=5001;
+cqlsh:first_keyspace> select * from emp;
+
+cqlsh:first_keyspace> create table test(a int,b list<text>,primary key(a));
+cqlsh:first_keyspace> insert into test(a,b) values(101,['a','b','c']);
+cqlsh:first_keyspace> update test set b[1]='x' where a=101;
+cqlsh:first_keyspace> select * from test;
+
+
+cqlsh:first_keyspace> create table test1(a int,b frozen<list<text>>,primary key(a));
+
+cqlsh:first_keyspace> create table test1(a int,b frozen<list<text>>,primary key(a));
+cqlsh:first_keyspace> insert into test1(a,b) values(101,['a','b','c']);
+cqlsh:first_keyspace> update test1 set b[1]='x' where a=101;
+InvalidRequest: Error from server: code=2200 [Invalid query] message="Invalid operation (b[1] = 'x') for frozen collection column b"
+cqlsh:first_keyspace> update test1 set b=['d','e'] where a=101;
+
+create table users(user_id int,name text,country text,primary key(user_id));
+insert into users(user_id,name,country) values(1001,'David','UK');
+insert into users(user_id,name,country) values(1002,'Arvind','IN');
+insert into users(user_id,name,country) values(1003,'Sandeep','IN');
+insert into users(user_id,name,country) values(1004,'Miller','US');
+insert into users(user_id,name,country) values(1005,'Perry','UK');
+
+cqlsh:first_keyspace> select * from users where user_id=1004;
+ 
+cqlsh:first_keyspace> select * from users where country='UK';
+cqlsh:first_keyspace> select * from users where country='UK' allow filtering;
+
+cqlsh:first_keyspace> create index country_idx on users(country);
+
+cqlsh:first_keyspace> alter table users add pincodes set<int>;
+
+cqlsh:first_keyspace> create index pincode_usr_idx on users(pincodes);
+cqlsh:first_keyspace> describe users;
+
+
+update users set pincodes={342444,124551} where user_id=1001;
+update users set pincodes={342444,724551} where user_id=1002;
+update users set pincodes={623441,124551} where user_id=1003;
+update users set pincodes={342844,124551} where user_id=1004;
+update users set pincodes={342444,532251} where user_id=1005;
+
+
+cqlsh:first_keyspace> select * from users where pincodes contains 124551;
+
+cqlsh:first_keyspace> copy employee(emp_id,name,designation) to 'c:/test/emp.csv';
+
+cqlsh:first_keyspace> create table employee_1(id int,name text,des text,primary key(id));
+cqlsh:first_keyspace> copy employee_1(id,name,des) from 'c:/test/emp.csv';
+
+select * from employee_1;
+
+https://dlcdn.apache.org//ant/binaries/apache-ant-1.9.16-bin.tar.gz
+
+steps:
+
+1. Stop any cassandra or cqlsh instances if they are running.
+
+2. Download Jdk 1.8 from https://www.oracle.com/in/java/technologies/javase/javase8-archive-downloads.html#license-lightbox
+and install it.
+3. set the JAVA_HOME environment variable.
+4. ant is a popular java based build tool.To run cassandra cluster manager, ant tool is required.
+Download ant from https://dlcdn.apache.org//ant/binaries/apache-ant-1.9.16-bin.tar.gz
+and extract it to c:\.
+
+5. set the ANT_HOME environment variable.
+
+6. Add %ANT_HOME%\bin to the path.
+
+7. ccm (cassandra cluster manager) is a python based tool.Download ccm using pip(python install package).
+
+pip install ccm
+
+8. ccm uses python based system utilities to start the cassandra nodes and access the os processes.
+So need to install python psutil package to access the system processes.
+
+pip install psutil
+
+ Set-ExecutionPolicy Unrestricted
+ 
+ ccm status
+ 
+127.0.0.1   127.0.0.2
+127.0.0.1   127.0.0.3
+127.0.0.1   127.0.0.4
+
+
+ccm create mycluster -v 3.11.10
+
+
+ccm status
+
+ccm populate -n 3
+
+
+ccm start
+
+ccm node1 show
+
+
+
+https://drive.google.com/drive/folders/11QxXLzeV3tnBscN_r_g0jXKWtBq_Lb5y?usp=sharing
