@@ -1,0 +1,174 @@
+===========================
+authenticator: PasswordAuthenticator
+
+cqlsh -u cassandra -p cassandra
+
+cassandra@cqlsh> create role user1 with login=true and password='pass@1';
+
+cassandra@cqlsh> exit;
+C:\Users\Administrator>cqlsh -u user1 -p pass@1
+
+
+user1@cqlsh> use first_keyspace;
+user1@cqlsh:first_keyspace> select * from employee;
+
+user1@cqlsh:first_keyspace> exit
+C:\Users\Administrator>cqlsh -u cassandra -p cassandra
+
+cassandra@cqlsh> grant select on first_keyspace.employee to user1;
+cassandra@cqlsh> describe keyspaces;
+
+first_keyspace  system_auth  system_distributed
+system_schema   system       system_traces
+
+cassandra@cqlsh> use system_auth;
+cassandra@cqlsh:system_auth> describe tables;
+
+resource_role_permissons_index  role_permissions  role_members  roles
+
+cassandra@cqlsh:system_auth> select * from roles;
+
+cassandra@cqlsh:system_auth> select * from role_permissions;
+
+cassandra@cqlsh:system_auth>
+
+cassandra@cqlsh:system_auth> exit;
+C:\Users\Administrator>cqlsh -u user1 -p pass@1
+
+================================
+
+
+C:\Users\Administrator>cqlsh
+Connection error: ('Unable to connect to any servers', {'127.0.0.1': AuthenticationFailed('Remote end requires authentication.',)})
+C:\Users\Administrator>cqlsh -u cassandra -p cassandra
+
+WARNING: console codepage must be set to cp65001 to support utf-8 encoding on Windows platforms.
+If you experience encoding problems, change your console codepage with 'chcp 65001' before starting cqlsh.
+
+Connected to Test Cluster at 127.0.0.1:9042.
+[cqlsh 5.0.1 | Cassandra 3.11.10 | CQL spec 3.4.4 | Native protocol v4]
+Use HELP for help.
+WARNING: pyreadline dependency missing.  Install to enable tab completion.
+cassandra@cqlsh>
+cassandra@cqlsh> create role user1 with login=true and password='pass@1';
+cassandra@cqlsh> describe roles;
+
+'roles' not found in keyspaces
+cassandra@cqlsh> describe users;
+
+'users' not found in keyspaces
+cassandra@cqlsh> exit;
+C:\Users\Administrator>cqlsh -u user1 -p pass@1
+
+WARNING: console codepage must be set to cp65001 to support utf-8 encoding on Windows platforms.
+If you experience encoding problems, change your console codepage with 'chcp 65001' before starting cqlsh.
+
+Connected to Test Cluster at 127.0.0.1:9042.
+[cqlsh 5.0.1 | Cassandra 3.11.10 | CQL spec 3.4.4 | Native protocol v4]
+Use HELP for help.
+WARNING: pyreadline dependency missing.  Install to enable tab completion.
+user1@cqlsh> use first_keyspace
+   ... ;
+user1@cqlsh:first_keyspace> describe tables;
+
+customer  users   test  employee_1       employee
+test1     sample  emp   books_by_author  x
+
+user1@cqlsh:first_keyspace> select * from customer;
+Unauthorized: Error from server: code=2100 [Unauthorized] message="User user1 has no SELECT permission on <table first_keyspace.customer> or any of its parents"
+user1@cqlsh:first_keyspace> exit
+C:\Users\Administrator>cqlsh -u cassandra -p cassandra
+
+WARNING: console codepage must be set to cp65001 to support utf-8 encoding on Windows platforms.
+If you experience encoding problems, change your console codepage with 'chcp 65001' before starting cqlsh.
+
+Connected to Test Cluster at 127.0.0.1:9042.
+[cqlsh 5.0.1 | Cassandra 3.11.10 | CQL spec 3.4.4 | Native protocol v4]
+Use HELP for help.
+WARNING: pyreadline dependency missing.  Install to enable tab completion.
+cassandra@cqlsh> grant select on first_keyspace.customer to user1;
+cassandra@cqlsh> describe keyspaces;
+
+first_keyspace  system_auth  system_distributed
+system_schema   system       system_traces
+
+cassandra@cqlsh> use system_auth;
+cassandra@cqlsh:system_auth> describe tables;
+
+resource_role_permissons_index  role_permissions  role_members  roles
+
+cassandra@cqlsh:system_auth> select * from roles;
+
+ role      | can_login | is_superuser | member_of | salted_hash
+-----------+-----------+--------------+-----------+--------------------------------------------------------------
+     user1 |      True |        False |      null | $2a$10$VRpqCP5k9kx0elDcm.mIv.Ume37a7fe9pjuLwRQ/OLTKZj11SC4iG
+ cassandra |      True |         True |      null | $2a$10$z5oM4U.mBEdjYLqkAoKsPuJ5erbEpdIMAIm3/bkxz3OyPyhfaBWdm
+
+(2 rows)
+cassandra@cqlsh:system_auth> select * from role_permissions;
+
+ role      | resource                     | permissions
+-----------+------------------------------+--------------------------------
+     user1 | data/first_keyspace/customer |                     {'SELECT'}
+ cassandra |                  roles/user1 | {'ALTER', 'AUTHORIZE', 'DROP'}
+
+(2 rows)
+cassandra@cqlsh:system_auth> exit
+C:\Users\Administrator>cqlsh -u user1 -p pass@1
+
+WARNING: console codepage must be set to cp65001 to support utf-8 encoding on Windows platforms.
+If you experience encoding problems, change your console codepage with 'chcp 65001' before starting cqlsh.
+
+Connected to Test Cluster at 127.0.0.1:9042.
+[cqlsh 5.0.1 | Cassandra 3.11.10 | CQL spec 3.4.4 | Native protocol v4]
+Use HELP for help.
+WARNING: pyreadline dependency missing.  Install to enable tab completion.
+user1@cqlsh> describe tables;
+
+Keyspace first_keyspace
+-----------------------
+customer  users   test  employee_1       employee
+test1     sample  emp   books_by_author  x
+
+Keyspace system_schema
+----------------------
+tables     triggers    views    keyspaces  dropped_columns
+functions  aggregates  indexes  types      columns
+
+Keyspace system_auth
+--------------------
+resource_role_permissons_index  role_permissions  role_members  roles
+
+Keyspace system
+---------------
+available_ranges          peers               batchlog        transferred_ranges
+batches                   compaction_history  size_estimates  hints
+prepared_statements       sstable_activity    built_views
+"IndexInfo"               peer_events         range_xfers
+views_builds_in_progress  paxos               local
+
+Keyspace system_distributed
+---------------------------
+repair_history  view_build_status  parent_repair_history
+
+Keyspace system_traces
+----------------------
+events  sessions
+
+user1@cqlsh> use first_keyspace;
+user1@cqlsh:first_keyspace> show tables;
+Improper show command.
+user1@cqlsh:first_keyspace> describe tables;
+
+customer  users   test  employee_1       employee
+test1     sample  emp   books_by_author  x
+
+user1@cqlsh:first_keyspace> select * from customer;
+
+ cust_id | current_address                                                                     | name
+---------+-------------------------------------------------------------------------------------+--------
+    6002 | {door_no: 123, street_name: 'Nethaji Road', location: 'Malad West', city: 'Mumbai'} |  Rajiv
+    6001 | {door_no: 523, street_name: 'G-10th Street', location: 'Ulsoor', city: 'Bangalore'} | Arvind
+
+(2 rows)
+user1@cqlsh:first_keyspace>
