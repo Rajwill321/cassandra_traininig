@@ -1,0 +1,195 @@
+Microsoft Windows [Version 10.0.19042.746]
+(c) 2020 Microsoft Corporation. All rights reserved.
+
+C:\Users\Administrator>nodetool -p 7100 getendpoints test_keyspace customer 5001
+127.0.0.3
+127.0.0.1
+
+C:\Users\Administrator>nodetool -p 7100 flush
+
+C:\Users\Administrator>nodetool -p 7200 flush
+
+C:\Users\Administrator>nodetool -p 7300 flush
+
+C:\Users\Administrator>path=c:\apache-cassandra-3.11.10\tools\bin;%path%
+
+C:\Users\Administrator>sstabledump C:\Users\Administrator\.ccm\mycluster\node2\data0\test_keyspace\customer-c4fb837009a711eebc4d419b8fb19e62\md-1-big-Data.db
+[
+  {
+    "partition" : {
+      "key" : [ "5005" ],
+      "position" : 0
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 18,
+        "liveness_info" : { "tstamp" : "2023-06-13T05:05:12.096Z" },
+        "cells" : [
+          { "name" : "balance", "value" : 70000.0 },
+          { "name" : "name", "value" : "Arun" }
+        ]
+      }
+    ]
+  },
+  {
+    "partition" : {
+      "key" : [ "5004" ],
+      "position" : 40
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 58,
+        "liveness_info" : { "tstamp" : "2023-06-13T05:05:10.305Z" },
+        "cells" : [
+          { "name" : "balance", "value" : 30000.0 },
+          { "name" : "name", "value" : "Raghav" }
+        ]
+      }
+    ]
+  },
+  {
+    "partition" : {
+      "key" : [ "5003" ],
+      "position" : 82
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 100,
+        "liveness_info" : { "tstamp" : "2023-06-13T05:05:10.291Z" },
+        "cells" : [
+          { "name" : "balance", "value" : 40000.0 },
+          { "name" : "name", "value" : "Surya" }
+        ]
+      }
+    ]
+  },
+  {
+    "partition" : {
+      "key" : [ "5002" ],
+      "position" : 122
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 140,
+        "liveness_info" : { "tstamp" : "2023-06-13T05:05:10.281Z" },
+        "cells" : [
+          { "name" : "balance", "value" : 20000.0 },
+          { "name" : "name", "value" : "Deva" }
+        ]
+      }
+    ]
+  }
+]
+C:\Users\Administrator>sstabledump C:\Users\Administrator\.ccm\mycluster\node1\data0\test_keyspace\customer-c4fb837009a711eebc4d419b8fb19e62\md-1-big-Data.db
+[
+  {
+    "partition" : {
+      "key" : [ "5001" ],
+      "position" : 0
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 18,
+        "liveness_info" : { "tstamp" : "2023-06-13T05:05:10.257Z" },
+        "cells" : [
+          { "name" : "balance", "value" : 30000.0 },
+          { "name" : "name", "value" : "Arvind" }
+        ]
+      }
+    ]
+  },
+  {
+    "partition" : {
+      "key" : [ "5003" ],
+      "position" : 40
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 58,
+        "liveness_info" : { "tstamp" : "2023-06-13T05:05:10.291Z" },
+        "cells" : [
+          { "name" : "balance", "value" : 40000.0 },
+          { "name" : "name", "value" : "Surya" }
+        ]
+      }
+    ]
+  },
+  {
+    "partition" : {
+      "key" : [ "5002" ],
+      "position" : 81
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 99,
+        "liveness_info" : { "tstamp" : "2023-06-13T05:05:10.281Z" },
+        "cells" : [
+          { "name" : "balance", "value" : 20000.0 },
+          { "name" : "name", "value" : "Deva" }
+        ]
+      }
+    ]
+  }
+]
+C:\Users\Administrator>sstabledump C:\Users\Administrator\.ccm\mycluster\node3\data0\test_keyspace\customer-c4fb837009a711eebc4d419b8fb19e62\md-1-big-Data.db
+[
+  {
+    "partition" : {
+      "key" : [ "5005" ],
+      "position" : 0
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 18,
+        "liveness_info" : { "tstamp" : "2023-06-13T05:05:12.096Z" },
+        "cells" : [
+          { "name" : "balance", "value" : 70000.0 },
+          { "name" : "name", "value" : "Arun" }
+        ]
+      }
+    ]
+  },
+  {
+    "partition" : {
+      "key" : [ "5004" ],
+      "position" : 40
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 58,
+        "liveness_info" : { "tstamp" : "2023-06-13T05:05:10.305Z" },
+        "cells" : [
+          { "name" : "balance", "value" : 30000.0 },
+          { "name" : "name", "value" : "Raghav" }
+        ]
+      }
+    ]
+  },
+  {
+    "partition" : {
+      "key" : [ "5001" ],
+      "position" : 82
+    },
+    "rows" : [
+      {
+        "type" : "row",
+        "position" : 100,
+        "liveness_info" : { "tstamp" : "2023-06-13T05:05:10.257Z" },
+        "cells" : [
+          { "name" : "balance", "value" : 30000.0 },
+          { "name" : "name", "value" : "Arvind" }
+        ]
+      }
+    ]
+  }
+]
+C:\Users\Administrator>
